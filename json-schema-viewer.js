@@ -435,37 +435,18 @@ if (typeof JSV === 'undefined') {
         setInfo: function(node) {
             var schema = $('#info-tab-schema');
             var def = $('#info-tab-def');
-            var ex = $('#info-tab-example');
+            var ex = $('#info-examples');
 
             var height = ($('#info-panel').innerHeight() - $('#info-panel .ui-panel-inner').outerHeight() + $('#info-panel #info-tabs').height()) -
                 $('#info-panel #info-tabs-navbar').height() - (schema.outerHeight(true) - schema.height());
 
-            $.each([schema, def, ex], function(i, e){
+            $.each([schema, def], function(i, e){
                 e.height(height);
             });
 
             $('#info-definition').html(node.description || 'No definition provided.');
             $('#info-type').html(node.displayType.toString());
-
-            if(node.translation) {
-                var trans = $('<ul></ul>');
-
-                $.each(node.translation, function(p, v) {
-                    var li = $('<li>' + p + '</li>');
-                    var ul = $('<ul></ul>');
-
-                    $.each(v, function(i, e) {
-                       ul.append('<li>' + e + '</li>');
-                    });
-
-                    trans.append(li.append(ul));
-                });
-
-                $('#info-translation').html(trans);
-            } else {
-                $('#info-translation').html('No translations available.');
-            }
-
+            ex.height(def.height() - $('#info-definition').height() - $('#info-type').height());
 
             JSV.createPre(schema, tv4.getSchema(node.schema), false, node.plainName);
 
@@ -473,19 +454,11 @@ if (typeof JSV === 'undefined') {
 
             if(example) {
                 if(example !== JSV.example) {
-                    $.getJSON(node.schema.match( /^(.*?)(?=[^\/]*\.json)/g ) + example, function(data) {
-                        var pointer = example.split('#')[1];
-
-                        if(pointer) {
-                            data = jsonpointer.get(data, pointer);
-                        }
-
-                        JSV.createPre(ex, data, false, node.plainName);
-                        JSV.example = example;
-                    }).fail(function() {
-                        ex.html('<h3>No example found.</h3>');
-                        JSV.example = false;
-                    });
+                    if (example && example.length > 0) {
+                      ex.html('');                      
+                      JSV.createPre(ex, example, false, node.plainName, true);
+                    }
+                    JSV.example = example;
                 } else {
                     var pre = ex.find('pre'),
                         highEl;
@@ -503,7 +476,7 @@ if (typeof JSV === 'undefined') {
                     }
                 }
             } else {
-                ex.html('<h3>No example available.</h3>');
+                ex.html('<p>No example available.</p>');
                 JSV.example = false;
             }
         },
@@ -515,8 +488,9 @@ if (typeof JSV === 'undefined') {
          * @param {object} obj The obj to stringify and display
          * @param {string} title The title for the new window
          * @param {string} exp The string to highlight
+         * @param {boolean} hideBtn True to hide the button
          */
-        createPre: function(el, obj, title, exp) {
+        createPre: function(el, obj, title, exp, hideBtn) {
             var pre = $('<pre><code class="language-json">' + JSON.stringify(obj, null, '  ') + '</code></pre>');
             var btn = $('<a href="#" class="ui-btn ui-mini ui-icon-action ui-btn-icon-right">Open in new window</a>').click(function() {
                 var w = window.open('', 'pre', null, true);
@@ -528,7 +502,9 @@ if (typeof JSV === 'undefined') {
                 w.document.close();
             });
 
-            el.html(btn);
+            if (!hideBtn) {
+              el.html(btn);
+            }
 
             if(exp) {
                 pre.highlight(exp, 'highlight', true);
@@ -727,7 +703,7 @@ if (typeof JSV === 'undefined') {
                 type: s.type,
                 displayType: s.type || (s['enum'] ? 'enum: ' + s['enum'].join(', ') : s.items ? 'array' : s.properties ? 'object' : 'ambiguous'),
                 translation: schema.translation || s.translation,
-                example: schema.example || s.example,
+                example: schema.examples || s.examples,
                 opacity: real ? 1 : 0.5,
                 required: s.required,
                 schema: s.id || s.$id || schema.$ref || parentSchema(parent),
