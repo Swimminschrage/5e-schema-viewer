@@ -10,7 +10,7 @@ matrix:
   fast_finish: true
 deploy:
   provider: pages
-  local_dir: docs
+  local_dir: prod
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   keep_history: true
