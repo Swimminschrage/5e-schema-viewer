@@ -85,7 +85,7 @@ module.exports = function(grunt) {
          * @see http://blog.stevenlevithan.com/archives/date-time-format
          */
 
-        ver : 1,
+        ver : 2,
 
         /*----------------------------------( BOWER )----------------------------------*/
 
