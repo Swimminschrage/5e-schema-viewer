@@ -498,7 +498,7 @@ if (typeof JSV === 'undefined') {
                 $(w.document.body).html($('<div>').append(pre.clone().height('95%')).html());
                 hljs.highlightBlock($(w.document.body).children('pre')[0]);
                 $(w.document.body).append('<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/default.min.css">');
-                w.document.title = title || 'JSON Schema Viewer';
+                w.document.title = title || '5e Module Schema';
                 w.document.close();
             });
 
